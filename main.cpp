@@ -30,6 +30,8 @@ class LibraryCatalog {
 private:
     vector<Author*> authorsPrimaryIndex;
     vector<Book*> booksPrimaryIndex;
+
+    vector<Author*> auther  SecondaryIndex;
     vector<Book*> booksSecondaryIndex;
 
 public:
@@ -90,7 +92,7 @@ public:
 
         if (it) {
             // Display author information
-            cout << "Author found: " << (it)->authorName << ", " << (*it)->address << endl;
+            cout << "Author found: " << (*it)->authorName << ", " << (*it)->address << endl;
         } else {
             cout << "Author not found." << endl;
         }
