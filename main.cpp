@@ -11,11 +11,13 @@ int main() {
     librarySystem.addAuthor("C002", "Jane Smith", "456 Oak St");
     librarySystem.addAuthor("B003", "ronald Sam", "153 Osten St");
 
-/*
-    librarySystem.addBook("B001", "Introduction to C++", "A001");
-    librarySystem.addBook("B002", "Data Structures and Algorithms", "A002");
 
-    librarySystem.searchByAuthorId("A001");
+    librarySystem.addBook("B001", "Introduction to C++", "A001");
+    librarySystem.addBook("A002", "Data Structures and Algorithms", "C002");
+    librarySystem.addBook("C002", "Data Structures and Algorithms", "B003");
+
+
+/*
     librarySystem.searchByIsbn("B002");
 
     librarySystem.updateBook("B001", "C++ Programming");
