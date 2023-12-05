@@ -17,9 +17,11 @@ int main() {
     librarySystem.addBook("C002", "Data Structures and Algorithms", "B003");
 
 
-/*
-    librarySystem.searchByIsbn("B002");
 
+    librarySystem.deleteAuthorByID("B003");
+    librarySystem.deleteBookByISBN("B001");
+
+/*
     librarySystem.updateBook("B001", "C++ Programming");
     librarySystem.updateAuthorName("A002", "Jane Johnson");
 

@@ -11,7 +11,8 @@
 
 using namespace std;
 
-class LibraryCatalog {
+class LibraryCatalog
+{
 private:
     fstream fileAuthors,fileBooks,PrimIndexAuthor,ScndIndexAuthor,PrimIndexBook,ScndIndexBook;
 
@@ -30,7 +31,8 @@ private:
 
 public:
 
-	LibraryCatalog(){
+    LibraryCatalog()
+    {
         offsetAuthors.push(0);
         offsetBooks.push(0);
         //fileAuthors.open("Authors.txt", ios::out|ios::app|ios::in);
@@ -42,8 +44,10 @@ public:
         //PrimIndexBook.open("PrimaryBo.txt", ios::out|ios::app|ios::in);
         //ScndIndexBook.open("SecondaryBo.txt", ios::out|ios::app|ios::in);
 
-	}
-	~LibraryCatalog(){
+    }
+//****************************************************************************************************
+    ~LibraryCatalog()
+    {
         fileAuthors.close();
         fileBooks.close();
 
@@ -52,40 +56,68 @@ public:
 
         PrimIndexBook.close();
         ScndIndexBook.close();
-	}
-//****************************************************************************************************
-void SortFile(string filePath){
-    fstream File(filePath);
-    vector<string> lines;
-    if (File.is_open()) {
-        string line;
-        while (getline(File, line)) {
-            lines.push_back(line);
-        }
-        File.close();
     }
-    sort(lines.begin(), lines.end());//Sort the vector
-    File.open(filePath,std::fstream::out | std::fstream::trunc );//Empty the original one
-    for (const auto& line : lines) {
+
+//****************************************************************************************************
+    template <typename T>
+    void DeleteForAll(vector<T>& OriginalVector,string filepath,string DeletedTarget)
+    {
+        vector<T> TempOfdata;
+        for (T elem : OriginalVector)
+        {
+            if (elem.getId() == DeletedTarget)
+                continue;
+            TempOfdata.push_back(elem);
+        }
+
+        ofstream File(filepath, std::fstream::out | std::fstream::trunc);
+        for (T rec : TempOfdata)
+            File << rec.toString();
+
+        File.close();
+        OriginalVector.clear();
+        OriginalVector = TempOfdata;
+    }
+//****************************************************************************************************
+    void SortFile(string filePath)
+    {
+        fstream File(filePath);
+        vector<string> lines;
+        if (File.is_open())
+        {
+            string line;
+            while (getline(File, line))
+            {
+                lines.push_back(line);
+            }
+            File.close();
+        }
+        sort(lines.begin(), lines.end());//Sort the vector
+        File.open(filePath,std::fstream::out | std::fstream::trunc );//Empty the original one
+        for (const auto& line : lines)
+        {
             File << line << endl;
         }
-    File.close();
+        File.close();
 
-}
-//****************************************************************************************************
-int calculateQueueSum(queue<int>& myQueue) {
-    queue<int> tempQueue = myQueue;
-    int sum = 0;
-
-    while (!tempQueue.empty()) {
-        sum += tempQueue.front();
-        tempQueue.pop();
     }
-    return sum;
-}
+//****************************************************************************************************
+    int calculateQueueSum(queue<int>& myQueue)
+    {
+        queue<int> tempQueue = myQueue;
+        int sum = 0;
+
+        while (!tempQueue.empty())
+        {
+            sum += tempQueue.front();
+            tempQueue.pop();
+        }
+        return sum;
+    }
 
 //****************************************************************************************************
-    void addAuthor(string authorId,string authorName,string address) {//Done
+    void addAuthor(string authorId,string authorName,string address)  //Done
+    {
 
         fileAuthors.open("Authors.txt", ios::out|ios::app|ios::in);
         PrimIndexAuthor.open("PrimaryAu.txt", ios::out|ios::app|ios::in);
@@ -103,14 +135,14 @@ int calculateQueueSum(queue<int>& myQueue) {
         offsetAuthors.push(Size);
 
         ///Primary Index
-        PrimIndexAuthor << newAuthor.authorId << "|" <<Offset << endl;//Add the Primary Index to the file
         AuthorPIndex newAuthorPIndex (newAuthor.authorId,Offset);
+        PrimIndexAuthor << newAuthorPIndex.toString();
         AuthorsPrimaryIndex.push_back(newAuthorPIndex);//Add it to the primary list
         SortFile("PrimaryAu.txt");
 
         ///Secondary Index
-        ScndIndexAuthor << newAuthor.authorName << "|" <<newAuthor.authorId << endl;//Add the Secondry Index to the file
         AuthorSIndex newAuthorSIndex (newAuthor.authorName,newAuthor.authorId);
+        ScndIndexAuthor << newAuthorSIndex.toString();
         AutherSecondaryIndex.push_back(newAuthorSIndex);//Add it to the Secondary list
         SortFile("SecondaryAu.txt");
 
@@ -120,7 +152,8 @@ int calculateQueueSum(queue<int>& myQueue) {
     }
 
 //****************************************************************************************************
-    void addBook(string isbn, string title, string authorId) {
+    void addBook(string isbn, string title, string authorId)
+    {
         fileBooks.open("Books.txt", ios::out|ios::app|ios::in);
         PrimIndexBook.open("PrimaryBo.txt", ios::out|ios::app|ios::in);
         ScndIndexBook.open("SecondaryBo.txt", ios::out|ios::app|ios::in);
@@ -136,14 +169,14 @@ int calculateQueueSum(queue<int>& myQueue) {
         offsetBooks.push(Size);
 
         ///Primary Index
-        PrimIndexBook << newBook.isbn << "|" <<Offset << endl;//Add the Primary Index to the file
         BookPIndex newBookPIndex(newBook.isbn,Offset);
+        PrimIndexBook << newBookPIndex.toString();
         BooksPrimaryIndex.push_back(newBookPIndex);//Add it to the primary list
         SortFile("PrimaryBo.txt");
 
         ///Secondary Index
-        ScndIndexBook << newBook.isbn << "|" <<newBook.authorId << endl;//Add the Secondry Index to the file
         BookSIndex newBookSIndex(newBook.authorId,newBook.isbn);
+        ScndIndexBook << newBookSIndex.toString();
         BooksSecondaryIndex.push_back(newBookSIndex);//Add it to the Secondary list
         SortFile("SecondaryBo.txt");
 
@@ -153,57 +186,39 @@ int calculateQueueSum(queue<int>& myQueue) {
 
     }
 //****************************************************************************************************
-void deleteAuthorByID(string authorId) {//I got so many problems while trying with vectors
-    fileAuthors.open("Authors.txt", ios::out|ios::app|ios::in);
-    string line;
-    getline(fileAuthors, line);
-    int rrn = searchByAuthorId(authorId);
-    if (!rrn){
-        cout<<"Author is not exist"<<endl;
-        return;
-    }
-    string SizeOfAuthorLine;
-    for(int i = rrn+1;i < rrn+3;i++)
-        SizeOfAuthorLine+=line[i];
-    int Size = stoi(SizeOfAuthorLine);
-    for(int i = rrn+3;i <= Size;i++){
-
+    void deleteAuthorByID(string authorId)
+    {
+        DeleteForAll(Authors,"Authors.txt",authorId);
+        DeleteForAll(AuthorsPrimaryIndex,"PrimaryAu.txt",authorId);
+        DeleteForAll(AutherSecondaryIndex,"SecondaryAu.txt",authorId);
     }
 
-
-}
-/*
 //****************************************************************************************************
-    void deleteBook(string& isbn) {
-        auto it = find_if(booksPrimaryIndex.begin(), booksPrimaryIndex.end(),
-                          [isbn](Book* book) { return book->isbn == isbn; });
-
-        if (it != booksPrimaryIndex.end()) {
-            // Mark as deleted (optional: free memory)
-            (*it)->isbn = "*DELETED*";
-            // Update indexes
-            sort(booksPrimaryIndex.begin(), booksPrimaryIndex.end(),
-                 [](Book* a, Book* b) { return a->isbn < b->isbn; });
-            sort(booksSecondaryIndex.begin(), booksSecondaryIndex.end(),comparebooksByisbn);
-        } else {
-            cout << "Book not found." << endl;
-        }
+    void deleteBookByISBN(string isbn)
+    {
+        DeleteForAll(Books,"Books.txt",isbn);
+        DeleteForAll(BooksPrimaryIndex,"PrimaryBo.txt",isbn);
+        DeleteForAll(BooksSecondaryIndex,"SecondaryBo.txt",isbn);
     }
-*/
+
 //**** ************************************************************************************************
-    int searchByAuthorId(string authorId) {
+    int searchByAuthorId(string authorId)
+    {
         //I could make it with the vectors but its more professional
         PrimIndexAuthor.open("PrimaryAu.txt", ios::out|ios::app|ios::in);
         string line;
-        while (getline(PrimIndexAuthor, line)) {
+        while (getline(PrimIndexAuthor, line))
+        {
             istringstream iss(line);
             string currentID;
             int currentRRN;
 
             // Parsing ID and RRN from the line
-            if (getline(iss, currentID, '|') && iss >> currentRRN) {
+            if (getline(iss, currentID, '|') && iss >> currentRRN)
+            {
                 // Check if the current line's ID matches the target ID
-                if (currentID == authorId) {
+                if (currentID == authorId)
+                {
                     PrimIndexAuthor.close();
                     return currentRRN; // Return RRN if ID is found
                 }
@@ -213,18 +228,22 @@ void deleteAuthorByID(string authorId) {//I got so many problems while trying wi
     }
 
 //****************************************************************************************************
-    int searchByIsbn(string isbn) {
+    int searchByIsbn(string isbn)
+    {
         PrimIndexBook.open("PrimaryBo.txt", ios::out|ios::app|ios::in);
         string line;
-        while (getline(PrimIndexBook, line)) {
+        while (getline(PrimIndexBook, line))
+        {
             istringstream iss(line);
             string currentisbn;
             int currentRRN;
 
             // Parsing ID and RRN from the line
-            if (getline(iss, currentisbn, '|') && iss >> currentRRN) {
+            if (getline(iss, currentisbn, '|') && iss >> currentRRN)
+            {
                 // Check if the current line's ID matches the target ID
-                if (currentisbn == isbn) {
+                if (currentisbn == isbn)
+                {
                     PrimIndexBook.close();
                     return currentRRN; // Return RRN if ID is found
                 }
@@ -233,7 +252,7 @@ void deleteAuthorByID(string authorId) {//I got so many problems while trying wi
         return 0;
     }
     /*
-//****************************************************************************************************
+    //****************************************************************************************************
     void updateBook(string& isbn, string& newTitle) {
         auto it = find_if(booksPrimaryIndex.begin(), booksPrimaryIndex.end(),
                           [isbn](Book* book) { return book->isbn == isbn; });
@@ -249,7 +268,7 @@ void deleteAuthorByID(string authorId) {//I got so many problems while trying wi
             cout << "Book not found." << endl;
         }
     }
-//****************************************************************************************************
+    //****************************************************************************************************
     void updateAuthorName(string& authorId, string& newAuthorName) {
         auto it = find_if(authorsPrimaryIndex.begin(), authorsPrimaryIndex.end(),
                           [authorId](Author* author) { return author->authorId == authorId; });

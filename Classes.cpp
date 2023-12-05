@@ -66,7 +66,7 @@ public:
         this->authorName = member2;
         this->address = member3;
     }
-
+    string getId(){return authorId;}
 };
 
 
@@ -128,6 +128,7 @@ public:
         this->title = member2;
         this->authorId = member3;
     }
+    string getId(){return isbn;}
 
 
 };
@@ -140,6 +141,13 @@ struct AuthorPIndex {//Author ID As Primary Index
         this->RRN = RRN;
         this->authorId = authorId;
     }
+    string toString() {
+        ostringstream oss;
+        oss <<authorId << "|" << RRN << endl ;
+        return oss.str();
+    }
+    string getId(){return authorId;}
+
 
 };
 struct AuthorSIndex {//Author Name As Secondary Index
@@ -149,6 +157,12 @@ struct AuthorSIndex {//Author Name As Secondary Index
         this->Name = Name;
         this->authorId = authorId;
     }
+    string toString() {
+        ostringstream oss;
+        oss <<authorId << "|" << Name << endl ;
+        return oss.str();
+    }
+    string getId(){return authorId;}
 
 };
 
@@ -159,6 +173,12 @@ struct BookPIndex {//ISBN As Primary Index
         this->RRN = RRN;
         this->isbn = isbn;
     }
+    string toString() {
+        ostringstream oss;
+        oss <<isbn << "|" << RRN << endl ;
+        return oss.str();
+    }
+    string getId(){return isbn;}
 
 };
 struct BookSIndex {//Author ID As Secondary Index
@@ -168,6 +188,13 @@ struct BookSIndex {//Author ID As Secondary Index
         this->isbn = isbn;
         this->authorId = authorId;
     }
+    string toString() {
+        ostringstream oss;
+        oss <<authorId << "|" << isbn << endl ;
+        return oss.str();
+    }
+    string getId(){return isbn;}
+
 };
 
 /*
