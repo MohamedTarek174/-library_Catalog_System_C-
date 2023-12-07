@@ -11,22 +11,21 @@ int main() {
     librarySystem.addAuthor("C002", "Jane Smith", "456 Oak St");
     librarySystem.addAuthor("B003", "ronald Sam", "153 Osten St");
 
+    librarySystem.updateAuthorName("A001", "Jane Johnson");
 
     librarySystem.addBook("B001", "Introduction to C++", "A001");
     librarySystem.addBook("A002", "Data Structures and Algorithms", "C002");
     librarySystem.addBook("C002", "Data Structures and Algorithms", "B003");
 
-
-
-    librarySystem.deleteAuthorByID("B003");
-    librarySystem.deleteBookByISBN("B001");
-
-/*
     librarySystem.updateBook("B001", "C++ Programming");
-    librarySystem.updateAuthorName("A002", "Jane Johnson");
+
+    //librarySystem.deleteAuthorByID("B003");
+    //librarySystem.deleteBookByISBN("B001");
 
 
-    librarySystem.deleteAuthor("A003"); // This will print "Author not found."
-*/
+
+
+    //librarySystem.deleteAuthor("A003"); // This will print "Author not found."
+
     return 0;
 }
