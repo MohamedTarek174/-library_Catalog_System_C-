@@ -79,58 +79,9 @@ public:
         DeleteForAll(BooksPrimaryIndex,"PrimaryBo.txt",isbn);
         DeleteForAll(BooksSecondaryIndex,"SecondaryBo.txt",isbn);
     }
-
-///****************************************************************************************************
-    int searchByAuthorId(string authorId)
-    {
-        //I could make it with the vectors but its more professional
-        PrimIndexAuthor.open("PrimaryAu.txt", ios::out|ios::app|ios::in);
-        string line;
-        while (getline(PrimIndexAuthor, line))
-        {
-            istringstream iss(line);
-            string currentID;
-            int currentRRN;
-
-            // Parsing ID and RRN from the line
-            if (getline(iss, currentID, '|') && iss >> currentRRN)
-            {
-                // Check if the current line's ID matches the target ID
-                if (currentID == authorId)
-                {
-                    PrimIndexAuthor.close();
-                    return currentRRN; // Return RRN if ID is found
-                }
-            }
-        }
-        return 0;
-    }
-
-///****************************************************************************************************
-    int searchByIsbn(string isbn)
-    {
-        PrimIndexBook.open("PrimaryBo.txt", ios::out|ios::app|ios::in);
-        string line;
-        while (getline(PrimIndexBook, line))
-        {
-            istringstream iss(line);
-            string currentisbn;
-            int currentRRN;
-
-            // Parsing ID and RRN from the line
-            if (getline(iss, currentisbn, '|') && iss >> currentRRN)
-            {
-                // Check if the current line's ID matches the target ID
-                if (currentisbn == isbn)
-                {
-                    PrimIndexBook.close();
-                    return currentRRN; // Return RRN if ID is found
-                }
-            }
-        }
-        return 0;
-    }
 */
+
+
 ///****************************************************************************************************
     void updateAuthorName(string authorId, string newAuthorName)//Error occur after making UpdateForAll function
     {

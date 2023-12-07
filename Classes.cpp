@@ -277,8 +277,165 @@ struct BookSIndex  //Author ID As Secondary Index
         return isbn;
     }
 };
+
+
 struct AvailList
 {
-    string Header;
-    ftruer
+
+    struct node
+    {
+        int RRN;
+        int size;
+        node* next;
+
+        node(int RRN, int size)
+        {
+            this->RRN = RRN;
+            next = nullptr;
+            this->size = size;
+        }
+
+        int getRRN()
+        {
+            return RRN;
+        }
+
+        int getSize()
+        {
+            return size;
+        }
+    };
+    
+    node* head;
+    int availSize;
+    
+
+
+    AvailList()
+    {
+        head = nullptr;
+        availSize = 0;
+    }
+
+
+    void insert(int RRN, int size)
+    {
+        node* newNode = new node(RRN, size);
+
+        if(head == nullptr)     //if the list is empty
+        {
+            head = newNode;
+            availSize++;
+            return;
+        }
+
+        newNode->next = head;
+        head = newNode;
+        availSize++;
+    }
+
+    int deleteNode(int RRN)
+    {
+        node* temp = head;
+        node* prev = nullptr;
+
+        if(temp != nullptr && temp->RRN == RRN)     //if the deleted node is the head
+        {
+            int rrn = temp->RRN;
+            head = temp->next;
+            delete temp;
+            availSize--;
+            return rrn;
+        }
+
+        while(temp != nullptr && temp->RRN != RRN)  //search for the node to be deleted
+        {
+            prev = temp;
+            temp = temp->next;
+        }
+
+        if(temp == nullptr)                         //if the node is not found
+            return NULL;
+
+        int rrn = temp->RRN;
+        prev->next = temp->next;                    //unlink the node from the list
+        delete temp;
+        availSize--;
+        return rrn;
+    }
+
+    int updateAvailList(int size)
+    { 
+        node* temp = head;
+
+        for (int i = 0; i < availSize; i++)
+        {
+            if (size > temp->size)
+            {
+                temp = temp->next;
+            }
+            else{
+                int rrn = deleteNode(temp->RRN);
+                return rrn;
+            }
+        }
+        
+        return NULL;
+    }
+
+
+    void print()
+    {
+        node* temp = head;
+        while(temp != nullptr)
+        {
+            cout<<temp->RRN<<" ";
+            temp = temp->next;
+        }
+        cout<<endl;
+    }
+
+    int getSize()
+    {
+        return availSize;
+    }
+
+    int getHead()
+    {
+        return head->RRN;
+    }
+
+    void setHead(int RRN)
+    {
+        head->RRN = RRN;
+    }
+
+    void setSize(int Size)
+    {
+        this->availSize = Size;
+    }
+
+    bool isEmpty()
+    {
+        return head == nullptr;
+    }
+
+    void clear()
+    {
+        node* temp = head;
+        while(temp != nullptr)
+        {
+            head = head->next;
+            delete temp;
+            temp = head;
+        }
+        availSize = 0;
+    }
+
+    ~AvailList()
+    {
+        clear();
+    }
+
+
 };
