@@ -370,7 +370,7 @@ struct AvailList
     int updateAvailList(int size)
     {
         node* temp = head;
-        cout<<"srg"<<size<<endl;
+
         for (int i = 0; i < availSize; i++)
         {
             if (size > temp->size)
@@ -378,6 +378,7 @@ struct AvailList
                 temp = temp->next;
             }
             else{
+                cout << "size  " << size << "temp size  " << temp->size << endl;
                 int rrn = deleteNode(temp->RRN);
                 return rrn;
             }

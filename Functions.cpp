@@ -192,11 +192,12 @@ void DeleteForAll(string filepath,vector<T>& OriginalVector,string DeletedTarget
     {
         if (elem.getFmember() == DeletedTarget)
         {
-            elem.setID("*   ");
             int RRN = searchByAuthorId(DeletedTarget);
+            elem.setID("*   ");
             string String = elem.toString();
             int size = String.length();
             availList.insert(RRN, size);
+            cout << "RRN: " << RRN << endl;
         }
         TempOfdata.push_back(elem);
 
