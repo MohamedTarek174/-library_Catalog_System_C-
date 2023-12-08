@@ -71,10 +71,9 @@ public:
             member3+=str[i];
             k++;
         }
-        //cout<<member1 << member2 << member3;
-        this->authorId = member1;//I we need it , use the setters
-        this->authorName = member2;
-        this->address = member3;
+        setID(member1);//I we need it , use the setters
+        setName(member2);
+        setaddress(member3);
     }
     string getFmember(){
         return authorId;
@@ -95,6 +94,10 @@ public:
     void setName(string newName)
     {
         this->authorName = newName;
+    }
+    void setaddress(string newaddress)
+    {
+        this->address = newaddress;
     }
 };
 ///******************************************************
@@ -221,7 +224,7 @@ struct AuthorSIndex  //Author Name As Secondary Index
     string toString()
     {
         ostringstream oss;
-        oss <<authorId << "|" << Name << endl ;
+        oss <<Name << "|" << authorId << endl ;
         return oss.str();
     }
 
@@ -305,10 +308,10 @@ struct AvailList
             return size;
         }
     };
-    
+
     node* head;
     int availSize;
-    
+
 
 
     AvailList()
@@ -365,9 +368,9 @@ struct AvailList
     }
 
     int updateAvailList(int size)
-    { 
+    {
         node* temp = head;
-
+        cout<<"srg"<<size<<endl;
         for (int i = 0; i < availSize; i++)
         {
             if (size > temp->size)
@@ -379,7 +382,6 @@ struct AvailList
                 return rrn;
             }
         }
-        
         return NULL;
     }
 

@@ -49,7 +49,6 @@ public:
 ///****************************************************************************************************
     void addAuthor(string authorId,string authorName,string address)  //Done
     {
-        //cout<<"efwrgewgr  "<<authorId<<" "<<authorName<<" "<<address<<endl;
         AddForDataFile("Authors.txt",Authors,authorId,authorName,address);
         AddForPIFile("PrimaryAu.txt",AuthorsPrimaryIndex,authorId,offsetAuthors);
         AddForSIFile("SecondaryAu.txt",AutherSecondaryIndex,authorName,authorId);
@@ -64,15 +63,26 @@ public:
     }
 
 ///****************************************************************************************************
-/*
+
     void deleteAuthorByID(string authorId)
     {
-        DeleteForAll(Authors,"Authors.txt",authorId);
-        DeleteForAll(AuthorsPrimaryIndex,"PrimaryAu.txt",authorId);
-        DeleteForAll(AutherSecondaryIndex,"SecondaryAu.txt",authorId);
+        fstream FileData("Authors.txt", std::fstream::out | std::fstream::trunc);
+        fstream FilePI("PrimaryAu.txt", std::fstream::out | std::fstream::trunc);
+        fstream FileSI("SecondaryAu.txt", std::fstream::out | std::fstream::trunc);
+        DeleteForAll("Authors.txt",Authors,authorId,offsetAuthors);
+
+        for (Author elem : Authors){
+            string ID = elem.getFmember();
+            string Name = elem.getSmember();
+            string Address = elem.getTtmember();
+            addAuthor(ID,Name,Address);
+            FileData.close();
+        }
+
     }
 
 ///****************************************************************************************************
+    /*
     void deleteBookByISBN(string isbn)
     {
         DeleteForAll(Books,"Books.txt",isbn);
