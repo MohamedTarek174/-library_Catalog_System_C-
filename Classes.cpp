@@ -17,14 +17,12 @@ public:
     string authorId;
     string authorName;
     string address;
-    //Author* nextAuthor;
 
     Author(string& authorId, string& authorName, string& address)
     {
         this->address = address;
         this->authorId = authorId;
         this->authorName = authorName;
-        //nextAuthor = nullptr;
     }
     Author() {}
 
@@ -39,65 +37,30 @@ public:
         return oss.str();
     }
 
-    void fromString(string str)
-    {
-        string sumInString;
-        for(int j = 0; j < 2; j++)
-            sumInString+=str[j];
 
-        int sum = stoi(sumInString);
-
-        string member1 = "",member2 ="",member3 = "";
-        char check = '|';
-        int k = 0;
-        for(int i = k+2; i < sum-2; i++)
-        {
-            if(str[i] == check)
-                break;
-            member1+=str[i];
-            k++;
-        }
-        for(int i = k+3; i < sum; i++)
-        {
-            if(str[i] == check)
-                break;
-            member2+=str[i];
-            k++;
-        }
-        for(int i = k+4; i < sum+2; i++)
-        {
-            if(str[i] == check)
-                break;
-            member3+=str[i];
-            k++;
-        }
-        setID(member1);//I we need it , use the setters
-        setName(member2);
-        setaddress(member3);
-    }
+    ///Getters
     string getFmember(){
         return authorId;
     }
     string getSmember(){
         return authorName;
     }
-
-    string getTtmember(){
+    string getTmember(){
         return address;
+    }
+    ///Setters
+    void setFirst(string authorId){
+        this->authorId = authorId;
+    }
+    void setSecond(string authorName){
+        this->authorName = authorName;
+    }
+    void setThird(string address)
+    {
+        this->address = address;
     }
     string PrimaryKey(){
         return authorId;
-    }
-    void setID(string authorId){
-        this->authorId = authorId;
-    }
-    void setName(string newName)
-    {
-        this->authorName = newName;
-    }
-    void setaddress(string newaddress)
-    {
-        this->address = newaddress;
     }
 };
 ///******************************************************
@@ -107,14 +70,12 @@ public:
     string isbn;
     string title;
     string authorId;
-    //Book* nextBook;
 
     Book(string& isbn,string& title,string& authorId)
     {
         this->authorId = authorId;
         this->title = title;
         this->isbn = isbn;
-        //nextBook = nullptr;
     }
     Book() {}
 
@@ -129,57 +90,26 @@ public:
         return oss.str();
     }
 
-    void fromString(string str)
-    {
-        string sumInString;
-        for(int j = 0; j < 2; j++)
-            sumInString+=str[j];
-
-        int sum = stoi(sumInString);
-
-        string member1 = "",member2 ="",member3 = "";
-        char check = '|';
-        int k = 0;
-        for(int i = k+2; i < sum-2; i++)
-        {
-            if(str[i] == check)
-                break;
-            member1+=str[i];
-            k++;
-        }
-        for(int i = k+3; i < sum; i++)
-        {
-            if(str[i] == check)
-                break;
-            member2+=str[i];
-            k++;
-        }
-        for(int i = k+4; i < sum+2; i++)
-        {
-            if(str[i] == check)
-                break;
-            member3+=str[i];
-            k++;
-        }
-        //cout<<member1 << member2 << member3;
-        this->isbn = member1;
-        this->title = member2;
-        this->authorId = member3;
-    }
+    ///Getters
     string getFmember(){
         return isbn;
     }
     string getSmember(){
         return title;
     }
-    string getTtmember(){
+    string getTmember(){
         return authorId;
     }
-    void setID(string authorId){
-        this->authorId = authorId;
+    ///Setters
+    void setFirst(string isbn){
+        this->isbn = isbn;
     }
-    void setName(string newName){
-        this->title = newName;
+    void setSecond(string title){
+        this->title = title;
+    }
+    void setThird(string authorId)
+    {
+        this->authorId = authorId;
     }
     string PrimaryKey(){
         return isbn;
@@ -202,10 +132,7 @@ struct AuthorPIndex  //Author ID As Primary Index
         oss <<authorId << "|" << RRN << endl ;
         return oss.str();
     }
-    string getId()
-    {
-        return authorId;
-    }
+
     string PrimaryKey(){
         return authorId;
     }
@@ -378,7 +305,6 @@ struct AvailList
                 temp = temp->next;
             }
             else{
-                cout << "size  " << size << "temp size  " << temp->size << endl;
                 int rrn = deleteNode(temp->RRN);
                 return rrn;
             }
@@ -392,7 +318,6 @@ struct AvailList
         node* temp = head;
         while(temp != nullptr)
         {
-            cout<<temp->RRN<<" ";
             temp = temp->next;
         }
         cout<<endl;
@@ -441,4 +366,17 @@ struct AvailList
     }
 
 
+};
+struct Condition {
+    string leftHand;
+    string relationalOperator;
+    string rightHand;
+};
+
+struct QueryInfo {
+    string operation;
+    string Value;
+    string tableName;
+    Condition condition;
+    bool hasCondition;
 };

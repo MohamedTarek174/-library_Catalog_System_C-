@@ -8,69 +8,103 @@
 #include <functional>
 using namespace std;
 int SizeAll = 0;
-
 AvailList availList;
 int checkAvailList(int size);
+template<typename T>
+vector<T> Temprory;
 
 
-int searchByAuthorId(string authorId){
-    fstream PrimIndexAuthor;
-    //I could make it with the vectors but its more professional
-    PrimIndexAuthor.open("PrimaryAu.txt", ios::out|ios::app|ios::in);
+int searchByAuthorId(string authorId)
+{
+    fstream File;
+    File.open("PrimaryAu.txt", ios::in|ios::out|ios::app);
     string line;
-    while (getline(PrimIndexAuthor, line))
+    int Current = -1;
+
+    while (getline(File, line))
     {
-        istringstream iss(line);
         string currentID;
-        int currentRRN;
+        string currentRRN;
 
-        // Parsing ID and RRN from the line
-        if (getline(iss, currentID, '|') && iss >> currentRRN)
+        int i;
+        for (i = 0; i < line.length(); i++)
         {
-            // Check if the current line's ID matches the target ID
-            if (currentID == authorId)
+            if (line[i] == '|')
+                break;
+            currentID += line[i];
+        }
+
+        if (currentID == authorId)
+        {
+            for (int j = i + 1; j < line.length(); j++)
             {
-                PrimIndexAuthor.close();
-                return currentRRN; // Return RRN if ID is found
+                currentRRN += line[j];
             }
+            Current = stoi(currentRRN);
+            break;
         }
     }
-    return 0;
+
+    File.close();
+    return Current;
 }
-///****************************************************************************************************
-int searchByIsbn(string isbn){
-    fstream PrimIndexBook;
-    PrimIndexBook.open("PrimaryBo.txt", ios::out|ios::app|ios::in);
-    string line;
-    while (getline(PrimIndexBook, line))
-    {
-        istringstream iss(line);
-        string currentisbn;
-        int currentRRN;
 
-        // Parsing ID and RRN from the line
-        if (getline(iss, currentisbn, '|') && iss >> currentRRN)
+///****************************************************************************************************
+int searchByIsbn(string isbn)
+{
+    fstream File;
+    File.open("PrimaryBo.txt", ios::in|ios::out|ios::app);
+
+    if (!File.is_open())
+    {
+        cerr << "Error opening file." << endl;
+        return -1;
+    }
+
+    string line;
+    int Current = -1;
+
+    while (getline(File, line))
+    {
+        string currentID;
+        string currentRRN;
+
+        int i;
+        for (i = 0; i < line.length(); i++)
         {
-            // Check if the current line's ID matches the target ID
-            if (currentisbn == isbn)
+            if (line[i] == '|')
+                break;
+            currentID += line[i];
+        }
+
+        if (currentID == isbn)
+        {
+            for (int j = i + 1; j < line.length(); j++)
             {
-                PrimIndexBook.close();
-                return currentRRN; // Return RRN if ID is found
+                currentRRN += line[j];
             }
+            Current = stoi(currentRRN);
+            break;
         }
     }
-    return 0;
+
+    File.close();
+    return Current;
+
 }
 ///****************************************************************************************************
 template <typename T>
-bool CheckIDs(string ID,vector<T>& OriginalVector){
-    for(T elem : OriginalVector){
+bool CheckIDs(string ID,vector<T>& OriginalVector)
+{
+    for(T elem : OriginalVector)
+    {
         if(elem.PrimaryKey() == ID)
             return true;
     }
 }
 ///****************************************************************************************************
-void SortFile(string filePath){
+void SortFile(string filePath)
+{
     fstream File(filePath);
     vector<string> lines;
     if (File.is_open())
@@ -94,7 +128,8 @@ void SortFile(string filePath){
 
 }
 ///****************************************************************************************************
-int calculateQueueSum(queue<int>& myQueue){
+int calculateQueueSum(queue<int>& myQueue)
+{
     queue<int> tempQueue = myQueue;
     int sum = 0;
 
@@ -107,7 +142,8 @@ int calculateQueueSum(queue<int>& myQueue){
 }
 ///****************************************************************************************************
 template <typename T>
-void AddtoFiles(string filepath,vector<T>& OriginalVector,T newT){
+void AddtoFiles(string filepath,vector<T>& OriginalVector,T newT)
+{
 
 
     fstream File;
@@ -121,30 +157,51 @@ void AddtoFiles(string filepath,vector<T>& OriginalVector,T newT){
 }
 ///****************************************************************************************************
 template <typename T>
-void AddForDataFile(string filepath,vector<T>& OriginalVector,string member1,string member2,string member3){
+void AddForDataFile(string filepath,vector<T>& OriginalVector,string member1,string member2,string member3)
+{
     T newT(member1, member2, member3);//Create one
     string String = newT.toString();
     int size = String.length();
-    cout<<size<<endl;
-    int availRRN = checkAvailList(size-2);
+    int availRRN;
+    if(!CheckIDs(member1,Temprory<T>))
+        availRRN = checkAvailList(size-2);
 
-    if (availRRN != NULL)                //if there is place in the avail list
+    if (availRRN != NULL && !CheckIDs(member1,Temprory<T>))
     {
-        fstream File;
-        File.open(filepath,ios::out|ios::app|ios::in);
-        File.seekg(availRRN,ios::beg);
-        cout<<availRRN<<endl;
+        cout<<"Check"<<endl;
+        stringstream stream;
+        stream << availRRN;
+        string RRNasString;
+        stream >> RRNasString;
+        char space = ' ';
+        RRNasString += space;
+        RRNasString += space;
 
-        //UpdateForAll();
-        return;
-    }else{//if there is no place in the avail list
+        for(T element : OriginalVector)
+        {
+            string ID = element.PrimaryKey();
+            if(ID == RRNasString)
+            {
+                element.setFirst(member1);
+                element.setSecond(member2);
+                element.setThird(member3);
+                AddtoFiles(filepath,OriginalVector,element);
+                break;
+            }
+        }
+
+    }
+    else  //if there is no place in the avail list
+    {
         AddtoFiles(filepath,OriginalVector,newT);
     }
+
 
 }
 ///****************************************************************************************************
 template <typename T>
-void AddForPIFile(string filepath,vector<T>& OriginalVector,string member,queue<int>& offsetTemp){
+void AddForPIFile(string filepath,vector<T>& OriginalVector,string member,queue<int>& offsetTemp)
+{
     int Offset = calculateQueueSum(offsetTemp);
     offsetTemp.push(SizeAll);
 
@@ -155,7 +212,8 @@ void AddForPIFile(string filepath,vector<T>& OriginalVector,string member,queue<
 }
 ///****************************************************************************************************
 template <typename T>
-void AddForSIFile(string filepath,vector<T>& OriginalVector,string member1,string member2){
+void AddForSIFile(string filepath,vector<T>& OriginalVector,string member1,string member2)
+{
     T newT(member1, member2);//Create one
     AddtoFiles(filepath,OriginalVector,newT);
     SortFile(filepath);
@@ -172,7 +230,7 @@ void UpdateForAll(vector<T>& OriginalVector,string Old,string New,queue<int>& of
     {
         if (elem.getFmember() == Old)
         {
-            elem.setName(New);
+            elem.setSecond(New);
         }
         TempOfdata.push_back(elem);
     }
@@ -182,7 +240,7 @@ void UpdateForAll(vector<T>& OriginalVector,string Old,string New,queue<int>& of
 }
 ///****************************************************************************************************
 template <typename T>
-void DeleteForAll(string filepath,vector<T>& OriginalVector,string DeletedTarget, queue<int>& offsetTemp)
+void DeleteForAll(string filepath,vector<T>& OriginalVector,string DeletedTarget, queue<int>& offsetTemp,int RRN)
 {
     queue<int> EmptyoffsetT;
     swap(offsetTemp, EmptyoffsetT);
@@ -192,30 +250,45 @@ void DeleteForAll(string filepath,vector<T>& OriginalVector,string DeletedTarget
     {
         if (elem.getFmember() == DeletedTarget)
         {
-            int RRN = searchByAuthorId(DeletedTarget);
-            elem.setID("*   ");
+            continue;
+            stringstream stream;
+            stream << RRN;
+            string RRNasString;
+            stream >> RRNasString;
+            char space = ' ';
+            RRNasString += space;
+            RRNasString += space;
+            elem.setFirst(RRNasString);
             string String = elem.toString();
             int size = String.length();
             availList.insert(RRN, size);
-            cout << "RRN: " << RRN << endl;
+
         }
         TempOfdata.push_back(elem);
-
+        Temprory<T> = TempOfdata;
     }
+
+
 
     OriginalVector.clear();
     OriginalVector = TempOfdata;
 
 }
 ///****************************************************************************************************
-int checkAvailList(int size){
+int checkAvailList(int size)
+{
     int availRRN = availList.updateAvailList(size);
 
-    if (availRRN != NULL){
+    if (availRRN != NULL)
+    {
         return availRRN;
-    }else{
-        cout << "No available space in avail list" << endl;
+    }
+    else
+    {
         return NULL;
     }
 
 }
+///****************************************************************************************************
+
+
