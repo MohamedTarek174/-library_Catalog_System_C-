@@ -126,6 +126,7 @@ struct AuthorPIndex  //Author ID As Primary Index
         this->RRN = RRN;
         this->authorId = authorId;
     }
+    AuthorPIndex(){}
     string toString()
     {
         ostringstream oss;
@@ -135,6 +136,13 @@ struct AuthorPIndex  //Author ID As Primary Index
 
     string PrimaryKey(){
         return authorId;
+    }
+       ///Setters
+    void setFirst(string authorId){
+        this->authorId = authorId;
+    }
+    void setSecond(int RRN){
+        this->RRN = RRN;
     }
 
 };
@@ -148,6 +156,7 @@ struct AuthorSIndex  //Author Name As Secondary Index
         this->Name = Name;
         this->authorId = authorId;
     }
+    AuthorSIndex(){}
     string toString()
     {
         ostringstream oss;
@@ -162,6 +171,13 @@ struct AuthorSIndex  //Author Name As Secondary Index
     {
         this->Name = newName;
     }
+       ///Setters
+    void setFirst(string Name){
+        this->Name = Name;
+    }
+    void setSecond(string authorId){
+        this->authorId = authorId;
+    }
 
 };
 ///******************************************************
@@ -174,6 +190,7 @@ struct BookPIndex  //ISBN As Primary Index
         this->RRN = RRN;
         this->isbn = isbn;
     }
+    BookPIndex(){}
     string toString()
     {
         ostringstream oss;
@@ -183,6 +200,13 @@ struct BookPIndex  //ISBN As Primary Index
 
     string PrimaryKey(){
         return isbn;
+    }
+       ///Setters
+    void setFirst(string isbn){
+        this->isbn = isbn;
+    }
+    void setSecond(int RRN){
+        this->RRN = RRN;
     }
 
 };
@@ -196,6 +220,7 @@ struct BookSIndex  //Author ID As Secondary Index
         this->isbn = isbn;
         this->authorId = authorId;
     }
+    BookSIndex(){}
     string toString()
     {
         ostringstream oss;
@@ -205,6 +230,13 @@ struct BookSIndex  //Author ID As Secondary Index
 
     string PrimaryKey(){
         return isbn;
+    }
+       ///Setters
+    void setFirst(string authorId){
+        this->authorId = authorId;
+    }
+    void setSecond(string isbn){
+        this->isbn = isbn;
     }
 };
 
@@ -284,11 +316,11 @@ struct AvailList
             temp = temp->next;
         }
 
-        if(temp == nullptr)                         //if the node is not found
+        if(temp == nullptr)
             return NULL;
 
         int rrn = temp->RRN;
-        prev->next = temp->next;                    //unlink the node from the list
+        prev->next = temp->next;
         delete temp;
         availSize--;
         return rrn;

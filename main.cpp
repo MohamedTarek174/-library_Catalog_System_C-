@@ -4,19 +4,18 @@
 using namespace std;
 
 int main() {
-    // Example usage:
-
     LibraryCatalog librarySystem;
 
     while (true)
     {
+        cout<<endl;
         cout << "Welcome to the library system ..." << endl;
         cout << "1- add an author" << endl;
         cout << "2- add a book" << endl;
         cout << "3- update an author's name" << endl;
         cout << "4- update a book's title" << endl;
-        cout << "5- delete a book by ISBN" << endl;
-        cout << "6- delete an author by ID" << endl;
+        cout << "5- delete a author by ID" << endl;
+        cout << "6- delete an book by ISBN" << endl;
         cout << "7- search for an author by ID" << endl;
         cout << "8- search for a book by ISBN" << endl;
         cout << "9- Write Query" << endl;
@@ -30,6 +29,10 @@ int main() {
             string authorId, authorName, address;
             cout << "Enter the author's ID: ";
             getline(cin, authorId);
+            if(librarySystem.checkAuthorForUpdate(authorId)){
+                cout<<"this Author ID already exist"<<endl;
+                continue;
+            }
             cout << "Enter the author's name: ";
             getline(cin, authorName);
             cout << "Enter the author's address: ";
@@ -41,6 +44,10 @@ int main() {
             string isbn, title, authorId;
             cout << "Enter the book's ISBN: ";
             getline(cin, isbn);
+            if(librarySystem.checkBookForUpdate(isbn )){
+                cout<<"this Book ISBN already exist"<<endl;
+                continue;
+            }
             cout << "Enter the book's title: ";
             getline(cin, title);
             cout << "Enter the author's ID: ";
@@ -52,6 +59,10 @@ int main() {
             string authorId, newName;
             cout << "Enter the author's ID: ";
             getline(cin, authorId);
+            if(!librarySystem.checkAuthorForUpdate(authorId)){
+                cout<<"this Author ID is not exist!!"<<endl;
+                continue;
+            }
             cout << "Enter the author's new name: ";
             getline(cin, newName);
             librarySystem.updateAuthorName(authorId, newName);
@@ -61,41 +72,61 @@ int main() {
             string isbn, newTitle;
             cout << "Enter the book's ISBN: ";
             getline(cin, isbn);
+            if(!librarySystem.checkBookForUpdate(isbn)){
+                cout<<"this Book ISBN is not exist!!"<<endl;
+                continue;
+            }
             cout << "Enter the book's new title: ";
             getline(cin, newTitle);
             librarySystem.updateBook(isbn, newTitle);
 
 
         }else if (choice == 5){
-            string isbn;
-            cout << "Enter the book's ISBN: ";
-            getline(cin, isbn);
-            librarySystem.deleteBookByISBN(isbn);
-
-
-        }else if (choice == 6){
             string authorId;
             cout << "Enter the author's ID: ";
             getline(cin, authorId);
+            if(!librarySystem.checkAuthorForUpdate(authorId)){
+                cout<<"this Author ID is not exist!!"<<endl;
+                continue;
+            }
             librarySystem.deleteAuthorByID(authorId);
 
 
-        }/*else if (choice == 7){
+        }else if (choice == 6){
+            string isbn;
+            cout << "Enter the book's ISBN: ";
+            getline(cin, isbn);
+            if(!librarySystem.checkBookForUpdate(isbn)){
+                cout<<"this Book ISBN is not exist!!"<<endl;
+                continue;
+            }
+            librarySystem.deleteBookByISBN(isbn);
+
+
+        }else if (choice == 7){
             string authorId;
             cout << "Enter the author's ID: ";
             getline(cin, authorId);
-            librarySystem.searchAuthorByID(authorId);
+            if(!librarySystem.checkAuthorForUpdate(authorId)){
+                cout<<"this Author ID is not exist!!"<<endl;
+                continue;
+            }
+            librarySystem.PrintAuthor(authorId);
 
 
         }else if (choice == 8){
             string isbn;
             cout << "Enter the book's ISBN: ";
             getline(cin, isbn);
-            librarySystem.searchBookByISBN(isbn);
+            if(!librarySystem.checkBookForUpdate(isbn)){
+                cout<<"this Book ISBN is not exist!!"<<endl;
+                continue;
+            }
+            librarySystem.PrintBook(isbn);
 
 
-        }*/else if (choice == 9){
-            librarySystem.writeQuery();
+        }else if (choice == 9){
+            librarySystem.CallQuery();
 
 
         }
@@ -106,30 +137,6 @@ int main() {
             cout << "Invalid choice." << endl;
         }
     }
-
-
-     //librarySystem.addAuthor("A001", "John Doe", "123 Main St");
-     //librarySystem.addAuthor("C002", "Jane Smith", "456 Oak St");//27
-     //librarySystem.addAuthor("B003", "ronald Sam", "153 Osten St");
-     //librarySystem.deleteAuthorByID("C002");
-     //librarySystem.addAuthor("D004", "Je Smith", "456 Oak St");
-
-    // //librarySystem.updateAuthorName("A001", "Jane Johnson");
-
-    // librarySystem.addBook("B001", "Introduction to C++", "A001");
-    // librarySystem.addBook("A002", "Data Structures and Algorithms", "C002");
-    // librarySystem.addBook("C002", "Data Structures and Algorithms", "B003");
-
-    // //librarySystem.updateBook("B001", "C++ Programming");
-
-    // //librarySystem.deleteAuthorByID("B003");
-    // //librarySystem.deleteBookByISBN("B001");
-
-
-
-
-    // //librarySystem.deleteAuthor("A003"); // This will print "Author not found."
-
     return 0;
 }
 

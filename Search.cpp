@@ -9,7 +9,7 @@ int searchbYFirstA(string ID,vector<T>& OriginalVector)//ID , ISBN (all)
     for(T elem : OriginalVector){
         string First = elem.getFmember();
         if(First == ID){
-            cout<<elem.getFmember() <<" "<<elem.getSmember()<<elem.getTmember()<<endl;
+            cout<<elem.getFmember() <<" "<<elem.getSmember()<<" "<<elem.getTmember()<<endl;
         }
     }
 
@@ -20,7 +20,7 @@ int searchBookbyIDA(string ID,vector<Book>& OriginalVector)//author ID (book)(al
     for(Book elem : OriginalVector){
         string First = elem.getTmember();
         if(First == ID){
-            cout<<elem.getFmember() <<" "<<elem.getSmember()<<elem.getTmember()<<endl;
+            cout<<elem.getFmember() <<" "<<elem.getSmember()<<" "<<elem.getTmember()<<endl;
         }
     }
 
@@ -31,7 +31,7 @@ int searchAuthorbyNameA(string Name,vector<Author>& OriginalVector)//author name
     for(Author elem : OriginalVector){
         string First = elem.getSmember();
         if(First == Name){
-            cout<<elem.getFmember() <<" "<<elem.getSmember()<<elem.getTmember()<<endl;
+            cout<<elem.getFmember() <<" "<<elem.getSmember()<<" "<<elem.getTmember()<<endl;
         }
     }
 
@@ -140,4 +140,28 @@ int searchAuthorbyName3(string Name,vector<Author>& OriginalVector)//author name
         }
     }
 
+}
+///**********************************************************************************************************
+template <typename T>
+int searchAllF(vector<T>& OriginalVector){
+    for(T elem : OriginalVector){
+        string First = elem.getSmember();
+        cout<<First<<endl;
+    }
+}
+///**********************************************************************************************************
+template <typename T>
+int searchAllS(vector<T>& OriginalVector){
+    for(T elem : OriginalVector){
+        string First = elem.getSmember();
+        cout<<First<<endl;
+    }
+}
+///**********************************************************************************************************
+template <typename T>
+int searchAllT(vector<T>& OriginalVector){
+    for(T elem : OriginalVector){
+        string First = elem.getSmember();
+        cout<<First<<endl;
+    }
 }

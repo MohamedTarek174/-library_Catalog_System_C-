@@ -23,6 +23,8 @@ int searchByAuthorId(string authorId)
 
     while (getline(File, line))
     {
+        if(line == "")
+            break;
         string currentID;
         string currentRRN;
 
@@ -66,6 +68,8 @@ int searchByIsbn(string isbn)
 
     while (getline(File, line))
     {
+        if(line == "")
+            break;
         string currentID;
         string currentRRN;
 
@@ -165,10 +169,8 @@ void AddForDataFile(string filepath,vector<T>& OriginalVector,string member1,str
     int availRRN;
     if(!CheckIDs(member1,Temprory<T>))
         availRRN = checkAvailList(size-2);
-
     if (availRRN != NULL && !CheckIDs(member1,Temprory<T>))
     {
-        cout<<"Check"<<endl;
         stringstream stream;
         stream << availRRN;
         string RRNasString;
@@ -176,22 +178,29 @@ void AddForDataFile(string filepath,vector<T>& OriginalVector,string member1,str
         char space = ' ';
         RRNasString += space;
         RRNasString += space;
-
+        vector<T> OriginalVector2 = OriginalVector;//Create a new Vector to has the new data
         for(T element : OriginalVector)
         {
             string ID = element.PrimaryKey();
             if(ID == RRNasString)
             {
-                element.setFirst(member1);
-                element.setSecond(member2);
-                element.setThird(member3);
-                AddtoFiles(filepath,OriginalVector,element);
-                break;
+                cout<<"LOL"<<endl;
+                T newT;
+                newT.setFirst(member1);
+                newT.setSecond(member2);
+                newT.setThird(member3);
+                OriginalVector2.push_back(newT);//add the new element in the correct place of the deleted one
+                continue;
             }
+            OriginalVector2.push_back(element);//add the rest of element
+        }//All elements in the OriginalVector2 now
+        OriginalVector.clear();//Empty this
+        for(T element : OriginalVector2){//Add all elements again to the OriginalVector
+            AddtoFiles(filepath,OriginalVector,element);
         }
 
     }
-    else  //if there is no place in the avail list
+    else
     {
         AddtoFiles(filepath,OriginalVector,newT);
     }
@@ -250,7 +259,7 @@ void DeleteForAll(string filepath,vector<T>& OriginalVector,string DeletedTarget
     {
         if (elem.getFmember() == DeletedTarget)
         {
-            continue;
+
             stringstream stream;
             stream << RRN;
             string RRNasString;
@@ -262,6 +271,9 @@ void DeleteForAll(string filepath,vector<T>& OriginalVector,string DeletedTarget
             string String = elem.toString();
             int size = String.length();
             availList.insert(RRN, size);
+
+            //string astrik = "*   ";
+            //elem.setFirst(astrik);
 
         }
         TempOfdata.push_back(elem);

@@ -7,7 +7,6 @@ using namespace std;
 class LibraryCatalog
 {
 private:
-    fstream fileAuthors,fileBooks,PrimIndexAuthor,ScndIndexAuthor,PrimIndexBook,ScndIndexBook;
 
     vector<Author> Authors;
     vector<Book> Books;
@@ -26,45 +25,173 @@ private:
 public:
     LibraryCatalog()
     {
-        //fstream FileAu("Authors.txt", std::fstream::out | std::fstream::trunc);
-        //fstream FilePIAu("PrimaryAu.txt", std::fstream::out | std::fstream::trunc);
-        //fstream FileSIAu("SecondaryAu.txt", std::fstream::out | std::fstream::trunc);
-        //fstream FileBo("Books.txt", std::fstream::out | std::fstream::trunc);
-        //fstream FilePIBo("PrimaryBo.txt", std::fstream::out | std::fstream::trunc);
-        //fstream FileSIBo("SecondaryBo.txt", std::fstream::out | std::fstream::trunc);
         offsetAuthors.push(0);
         offsetBooks.push(0);
+        ImportDataFile("Authors.txt",Authors);
+        ImportDataFile("Books.txt",Books);
+        ImportPIDataFile("PrimaryAu.txt",AuthorsPrimaryIndex,offsetAuthors);
+        ImportPIDataFile("PrimaryBo.txt",BooksPrimaryIndex,offsetBooks);
+        ImportSIDataFile("SecondaryAu.txt",AutherSecondaryIndex);
+        ImportSIDataFile("SecondaryBo.txt",BooksSecondaryIndex);
     }
-///****************************************************************************************************
-    ~LibraryCatalog()//Just for check
+
+///***************************************************************************************************************
+    ~LibraryCatalog(){}
+
+///********************************Import DATA********************************************************************
+    template <typename T>
+    void ImportDataFile(string filepath,vector<T>& OriginalVector){
+        fstream File;
+        File.open(filepath, ios::in|ios::out|ios::app);
+        string str,newline;
+        getline(File,str);
+        if(str == "")
+            return;
+        while(str!=newline){
+            string sumInString;
+            for(int j = 0;j < 2;j++)
+                sumInString+=str[j];
+            int sum = stoi(sumInString);
+            string member1 = "",member2 ="",member3 = "";
+            char check = '|';
+            int k = 0;
+            for(int i = k+2;i < sum-2;i++){
+                if(str[i] == check)
+                    break;
+                member1+=str[i];
+                k++;
+            }
+            for(int i = k+3;i < sum;i++){
+                if(str[i] == check)
+                    break;
+                member2+=str[i];
+                k++;
+            }
+            for(int i = k+4;i < sum+2;i++){
+                if(str[i] == check)
+                    break;
+                member3+=str[i];
+                k++;
+            }
+            T newT;
+            newT.setFirst(member1);
+            newT.setSecond(member2);
+            newT.setThird(member3);
+            newline += newT.toString();
+            OriginalVector.push_back(newT);
+        }
+        File.close();
+    }
+
+    template <typename T>
+    void ImportPIDataFile(string filepath,vector<T>& OriginalVector,queue<int>& QueuefOffsets)
     {
-        fileAuthors.close();
-        fileBooks.close();
+        fstream File;
+        File.open(filepath, ios::in|ios::out|ios::app);
+        string line;
 
-        PrimIndexAuthor.close();
-        ScndIndexAuthor.close();
+        while (getline(File, line))
+        {
+            if(line == "")
+                return;
+            string member1;
+            string member2;
 
-        PrimIndexBook.close();
-        ScndIndexBook.close();
+            int i;
+            for (i = 0; i < line.length(); i++)
+            {
+                if (line[i] == '|')
+                    break;
+                member1 += line[i];
+            }
+            i = 0;
+            for (int j = 0; j < line.length(); j++)
+            {
+                if(line[i] == member1[i] || line[i] == '|'){
+                    i++;
+                    continue;
+                }
+
+                member2+=line[i];
+                i++;
+            }
+            int member2INT = stoi(member2);
+            T newT;
+            newT.setFirst(member1);
+            newT.setSecond(member2INT);
+            OriginalVector.push_back(newT);
+            QueuefOffsets.push(member2INT);
+        }
+        File.close();
     }
-///****************************************************************************************************
-    void addAuthor(string authorId,string authorName,string address)  //Done
+
+    template <typename T>
+    void ImportSIDataFile(string filepath,vector<T>& OriginalVector)
+    {
+        fstream File;
+        File.open(filepath, ios::in|ios::out|ios::app);
+        string line;
+
+        while (getline(File, line))
+        {
+            if(line == "")
+                return;
+            string member1;
+            string member2;
+
+            int i;
+            for (i = 0; i < line.length(); i++)
+            {
+                if (line[i] == '|')
+                    break;
+                member1 += line[i];
+            }
+            for (int j = i+1; i < line.length()-i-1; j++)
+            {
+                member2 += line[j];
+            }
+            T newT;
+            newT.setFirst(member1);
+            newT.setSecond(member2);
+            OriginalVector.push_back(newT);
+        }
+        File.close();
+    }
+
+///*************************************Check IDs/ISBNs*********************************************************
+    bool checkAuthorForUpdate(string authorId)
+    {
+        if(!CheckIDs(authorId,Authors))
+            return false;
+        return true;
+    }
+
+    bool checkBookForUpdate(string isbn)
+    {
+        if(!CheckIDs(isbn,Books))
+            return false;
+        return true;
+    }
+
+///****************************************ADD*****************************************************************
+    void addAuthor(string authorId,string authorName,string address)
     {
         AddForDataFile("Authors.txt",Authors,authorId,authorName,address);
         AddForPIFile("PrimaryAu.txt",AuthorsPrimaryIndex,authorId,offsetAuthors);
         AddForSIFile("SecondaryAu.txt",AutherSecondaryIndex,authorName,authorId);
     }
-///****************************************************************************************************
-    void addBook(string isbn, string title, string authorId)
-    {
+
+    void addBook(string isbn, string title, string authorId){
+
         AddForDataFile("Books.txt",Books,isbn,title,authorId);
         AddForPIFile("PrimaryBo.txt",BooksPrimaryIndex,isbn,offsetBooks);
         AddForSIFile("SecondaryBo.txt",BooksSecondaryIndex,authorId,isbn);
     }
 
-///****************************************************************************************************
+///*************************************Delete*****************************************************************
     void deleteAuthorByID(string authorId)
     {
+
         int RRN = searchByAuthorId(authorId);
         fstream FileData("Authors.txt", std::fstream::out | std::fstream::trunc);
         fstream FilePI("PrimaryAu.txt", std::fstream::out | std::fstream::trunc);
@@ -81,9 +208,9 @@ public:
 
     }
 
-///****************************************************************************************************
     void deleteBookByISBN(string isbn)
     {
+
         int RRN = searchByIsbn(isbn);
         fstream FileData("Books.txt", std::fstream::out | std::fstream::trunc);
         fstream FilePI("PrimaryBo.txt", std::fstream::out | std::fstream::trunc);
@@ -100,7 +227,7 @@ public:
     }
 
 
-///****************************************************************************************************
+///***************************************Update**************************************************************
     void updateAuthorName(string authorId, string newAuthorName)
     {
 
@@ -118,9 +245,10 @@ public:
         }
 
     }
-///****************************************************************************************************
+
     void updateBook(string isbn, string newTitle)
     {
+
         fstream FileData("Books.txt", std::fstream::out | std::fstream::trunc);
         fstream FilePI("PrimaryBo.txt", std::fstream::out | std::fstream::trunc);
         fstream FileSI("SecondaryBo.txt", std::fstream::out | std::fstream::trunc);
@@ -133,171 +261,179 @@ public:
             addBook(Isbn,title,AuId);
         }
     }
-///*********************************************************************************************************
+
+///*************************************Query******************************************************************
     QueryInfo parseQuery(const string& query)
-{
-    QueryInfo info;
-
-    istringstream iss(query);
-
-    iss >> info.operation;
-
-    if (info.operation != "select")
     {
-        cout << "Invalid operation in the query." << endl;
+        QueryInfo info;
+
+        istringstream iss(query);
+
+        iss >> info.operation;
+
+        if (info.operation != "select")
+        {
+            cout << "Invalid operation in the query." << endl;
+            return info;
+        }
+
+        iss >> info.Value;
+
+        iss >> info.tableName;
+
+        getline(iss >> ws, info.tableName, ' ');
+
+        string whereKeyword;
+        iss >> whereKeyword;
+
+        if (whereKeyword == "where")
+        {
+            info.hasCondition = true;
+
+            iss >> info.condition.leftHand >> info.condition.relationalOperator >> info.condition.rightHand;
+
+            getline(iss >> ws, info.condition.rightHand);
+        }
+        else
+        {
+            info.hasCondition = false;
+        }
+
         return info;
     }
 
-    iss >> info.Value;
-
-    iss >> info.tableName;
-
-    getline(iss >> ws, info.tableName, ' ');
-
-    string whereKeyword;
-    iss >> whereKeyword;
-
-    if (whereKeyword == "where")
+    void CallQuery ()
     {
-        info.hasCondition = true;
+        string userQuery;
 
-        iss >> info.condition.leftHand >> info.condition.relationalOperator >> info.condition.rightHand;
+        cout << "Enter a query: ";
+        getline(cin, userQuery);
 
-        getline(iss >> ws, info.condition.rightHand);
-    }
-    else
-    {
-        info.hasCondition = false;
-    }
-
-    return info;
-}
-
-void CallQuery ()
-{
-    string userQuery;
-
-    cout << "Enter a query: ";
-    getline(cin, userQuery);
-
-    QueryInfo query = parseQuery(userQuery);
-
-    if (query.Value == "all")
-    {
-        if (query.tableName == "Authors")
+        QueryInfo query = parseQuery(userQuery);
+        if (query.Value == "all")
         {
-            if (query.hasCondition)
-                if (query.condition.relationalOperator == "=")
-                {
-                    if(query.condition.leftHand == "authurname"){
-                        searchAuthorbyNameA(query.condition.rightHand,Authors);
+            if (query.tableName == "Authors")
+            {
+                cout<<"first"<<endl;
+                if (query.hasCondition)
+                    if (query.condition.relationalOperator == "=")
+                    {
+                        cout<<"second"<<endl;
+                        if(query.condition.leftHand == "authorname"){
+                            cout<<"third"<<endl;
+                            searchAuthorbyNameA(query.condition.rightHand,Authors);
+                        }
+                        else if(query.condition.leftHand == "authurid"){
+                            searchbYFirstA(query.condition.rightHand,Authors);
+                        }
                     }
-                    else if(query.condition.leftHand == "authurid"){
-                        searchbYFirstA(query.condition.rightHand,Authors);
-                    }
+                    else
+                        cout << "Get all columns from table authors" << endl;
+            }
+            else if (query.tableName == "Books")
+            {
+                if (query.hasCondition)
+                    if (query.condition.relationalOperator == "=")
+                    {
+                        if(query.condition.leftHand == "authorid"){
+                            searchBookbyIDA(query.condition.rightHand,Books);
+                        }
+                        else if(query.condition.leftHand == "bookisbn"){
+                            searchbYFirstA(query.condition.rightHand,Books);
+                        }
 
-                }
-                else
-                    cout << "Get all columns from table authors" << endl;
+                    }
+                    else
+                        cout << "Get all columns from table authors" << endl;
+            }
+            else
+                cout << "table doesn't exist";
         }
-        else if (query.tableName == "Books")
+        else if (query.Value == "AuthorID" && query.tableName == "Authors")
         {
-            if (query.hasCondition)
-                if (query.condition.relationalOperator == "=")
-                {
-                    if(query.condition.leftHand == "authorid"){
-                        searchBookbyIDA(query.condition.rightHand,Authors);
-                    }
-                    else if(query.condition.leftHand == "bookisbn"){
-                        searchbYFirstA(query.condition.rightHand,Authors);
-                    }
-
-                }
-                else
-                    cout << "Get all columns from table authors" << endl;
+                searchAllF(Authors);
+                cout << "Get AuthorID column from table Authors" << endl;
+        }
+        else if (query.Value == "AuthorName" && query.tableName == "Authors")
+        {
+                searchAllS(Authors);
+                cout << "Get AuthorName column from table Authors" << endl;
+        }
+        else if (query.Value == "Address" && query.tableName == "Authors")
+        {
+                searchAllT(Authors);
+                cout << "Get Address column from table Authors" << endl;
+        }
+        else if (query.Value == "ISBN" && query.tableName == "Books")
+        {
+                searchAllF(Books);
+                cout << "Get ISBN column from table Books" << endl;
+        }
+        else if (query.Value == "BookTitle" && query.tableName == "Books")
+        {
+                searchAllS(Books);
+                cout << "Get BookTitle column from table Books" << endl;
+        }
+        else if (query.Value == "AuthorID" && query.tableName == "Books")
+        {
+                searchAllT(Books);
+                cout << "Get AuthorID column from table Books" << endl;
         }
         else
-            cout << "table doesn't exist";
+            cout << "Wrong inputs";
     }
-    else if (query.Value == "AuthorID" && query.tableName == "Authors")
-    {
-        if (query.hasCondition)
-            if (query.condition.relationalOperator == "=")
-            {
-                if(query.condition.leftHand == "authorid"){
-                    searchAuthorbyName1(query.condition.rightHand,Authors);
-                }
-                else if(query.condition.leftHand == "authurid"){
-                    searchbYFirstA(query.condition.rightHand,Authors);
-                }
 
-            }
-            else
-                cout << "Get AuthorID column from table Authors" << endl;
-    }
-    }
-    else if (query.Value == "AuthorName" && query.tableName == "Authors")
+///*************************************Print******************************************************************
+    void PrintAuthor(string authorId)
     {
-        if (query.hasCondition)
-            if (query.condition.relationalOperator == "=")
-            {
-                cout << "the left hand : " << query.condition.leftHand << endl;
-                cout << "the operator : " << query.condition.relationalOperator << endl;
-                cout << "the right hand : " << query.condition.rightHand << endl;
+        if(!checkAuthorForUpdate(authorId)){
+            cout<<"this Author ID is not exist!!"<<endl;
+            return;
+        }else{
+            int low = 0;
+            int high = Authors.size() - 1;
+
+            while (low <= high) {
+                int mid = low + (high - low) / 2;
+                Author midValue = Authors[mid];
+                string Key = midValue.PrimaryKey();
+                if (Key == authorId) {
+                    cout<<midValue.getFmember()<<" "<<midValue.getSmember()<<" "<<midValue.getTmember()<<endl;
+                    break;
+                } else if (Key < authorId) {
+                    low = mid + 1;
+                } else {
+                    high = mid - 1;
+                }
             }
-            else
-                cout << "Get AuthorName column from table Authors" << endl;
+        }
+
     }
-    else if (query.Value == "Address" && query.tableName == "Authors")
+
+    void PrintBook(string isbn)
     {
-        if (query.hasCondition)
-            if (query.condition.relationalOperator == "=")
-            {
-                cout << "the left hand : " << query.condition.leftHand << endl;
-                cout << "the operator : " << query.condition.relationalOperator << endl;
-                cout << "the right hand : " << query.condition.rightHand << endl;
+        if(!checkBookForUpdate(isbn)){
+            cout<<"this Book ISBN is not exist!!"<<endl;
+            return;
+        }else{
+            int low = 0;
+            int high = Books.size() - 1;
+
+            while (low <= high) {
+                int mid = low + (high - low) / 2;
+                Book midValue = Books[mid];
+                string Key = midValue.PrimaryKey();
+                if (Key == isbn) {
+                    cout<<midValue.getFmember()<<" "<<midValue.getSmember()<<" "<<midValue.getTmember()<<endl;
+                    break;
+                } else if (Key < isbn) {
+                    low = mid + 1;
+                } else {
+                    high = mid - 1;
+                }
             }
-            else
-                cout << "Get Address column from table Authors" << endl;
+        }
+
     }
-    else if (query.Value == "ISBN" && query.tableName == "Books")
-    {
-        if (query.hasCondition)
-            if (query.condition.relationalOperator == "=")
-            {
-                cout << "the left hand : " << query.condition.leftHand << endl;
-                cout << "the operator : " << query.condition.relationalOperator << endl;
-                cout << "the right hand : " << query.condition.rightHand << endl;
-            }
-            else
-                cout << "Get ISBN column from table Books" << endl;
-    }
-    else if (query.Value == "BookTitle" && query.tableName == "Books")
-    {
-        if (query.hasCondition)
-            else if (query.condition.relationalOperator == "=")
-            {
-                cout << "the left hand : " << query.condition.leftHand << endl;
-                cout << "the operator : " << query.condition.relationalOperator << endl;
-                cout << "the right hand : " << query.condition.rightHand << endl;
-            }
-            else
-                cout << "Get BookTitle column from table Books" << endl;
-    }
-    else if (query.Value == "AuthorID" && query.tableName == "Books")
-    {
-        if (query.hasCondition)
-            if (query.condition.relationalOperator == "=")
-            {
-                cout << "the left hand : " << query.condition.leftHand << endl;
-                cout << "the operator : " << query.condition.relationalOperator << endl;
-                cout << "the right hand : " << query.condition.rightHand << endl;
-            }
-            else
-                cout << "Get AuthorID column from table Books" << endl;
-    }
-    else
-        cout << "Wrong inputs";
-}
 
 };
