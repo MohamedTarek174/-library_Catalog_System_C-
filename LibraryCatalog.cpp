@@ -343,13 +343,10 @@ public:
         {
             if (query.tableName == "Authors")
             {
-                cout<<"first"<<endl;
                 if (query.hasCondition)
                     if (query.condition.relationalOperator == "=")
                     {
-                        cout<<"second"<<endl;
                         if(query.condition.leftHand == "authorname"){
-                            cout<<"third"<<endl;
                             searchAuthorbyNameA(query.condition.rightHand,Authors);
                         }
                         else if(query.condition.leftHand == "authurid"){

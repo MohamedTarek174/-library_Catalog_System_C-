@@ -184,6 +184,14 @@ bool AddForDataFile(string filepath,vector<T>& OriginalVector,string member1,str
             string ID = element.PrimaryKey();
             if(ID == RRNasString)//If the AVAIL place is found
             {
+                string elemStrin = element.toString();
+
+                while(elemStrin.length() > newT.toString().length()){
+                    cout<<newT.toString()<<endl;
+                    member3 += space;
+                    newT.setThird(member3);
+
+                }
                 OriginalVector2.push_back(newT);//add the new element in the correct place of the deleted one
                 continue;//skip the element with AVAILABE RRN (Deleted one)
             }
