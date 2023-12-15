@@ -148,8 +148,6 @@ int calculateQueueSum(queue<int>& myQueue)
 template <typename T>
 void AddtoFiles(string filepath,vector<T>& OriginalVector,T newT)
 {
-
-
     fstream File;
     File.open(filepath, ios::out|ios::app|ios::in);
     string newTString = newT.toString();
@@ -161,15 +159,16 @@ void AddtoFiles(string filepath,vector<T>& OriginalVector,T newT)
 }
 ///****************************************************************************************************
 template <typename T>
-void AddForDataFile(string filepath,vector<T>& OriginalVector,string member1,string member2,string member3)
+bool AddForDataFile(string filepath,vector<T>& OriginalVector,string member1,string member2,string member3)
 {
     T newT(member1, member2, member3);//Create one
-    string String = newT.toString();
+    string String = newT.toString();//Convert to string
     int size = String.length();
     int availRRN;
-    if(!CheckIDs(member1,Temprory<T>))
+    if(!CheckIDs(member1,Temprory<T>))//Call the function of the Avail list if just the element is NEW one
         availRRN = checkAvailList(size-2);
-    if (availRRN != NULL && !CheckIDs(member1,Temprory<T>))
+
+    if (availRRN != NULL && !CheckIDs(member1,Temprory<T>))//If there is a available place & adding NEW  element
     {
         stringstream stream;
         stream << availRRN;
@@ -177,32 +176,31 @@ void AddForDataFile(string filepath,vector<T>& OriginalVector,string member1,str
         stream >> RRNasString;
         char space = ' ';
         RRNasString += space;
-        RRNasString += space;
-        vector<T> OriginalVector2 = OriginalVector;//Create a new Vector to has the new data
+        RRNasString += space;//Create string with the same shape of that in the AVAIL list (RRN+space+space)
+
+        vector<T> OriginalVector2;//Create a new Vector to has the new data
         for(T element : OriginalVector)
         {
             string ID = element.PrimaryKey();
-            if(ID == RRNasString)
+            if(ID == RRNasString)//If the AVAIL place is found
             {
-                cout<<"LOL"<<endl;
-                T newT;
-                newT.setFirst(member1);
-                newT.setSecond(member2);
-                newT.setThird(member3);
                 OriginalVector2.push_back(newT);//add the new element in the correct place of the deleted one
-                continue;
+                continue;//skip the element with AVAILABE RRN (Deleted one)
             }
             OriginalVector2.push_back(element);//add the rest of element
         }//All elements in the OriginalVector2 now
-        OriginalVector.clear();//Empty this
-        for(T element : OriginalVector2){//Add all elements again to the OriginalVector
+        OriginalVector.clear();
+        fstream FileData(filepath, std::fstream::out | std::fstream::trunc);//Clear all data from file (not needed anymore)
+        FileData.open(filepath, ios::out|ios::app|ios::in);
+        for(T element : OriginalVector2)
             AddtoFiles(filepath,OriginalVector,element);
-        }
+        return true;//return 1 if the OriginalVector has changed into this process
 
     }
     else
     {
         AddtoFiles(filepath,OriginalVector,newT);
+        return false;//No changes
     }
 
 
@@ -252,7 +250,7 @@ template <typename T>
 void DeleteForAll(string filepath,vector<T>& OriginalVector,string DeletedTarget, queue<int>& offsetTemp,int RRN)
 {
     queue<int> EmptyoffsetT;
-    swap(offsetTemp, EmptyoffsetT);
+    swap(offsetTemp, EmptyoffsetT);//Clear the Offset queue to re-adding the same elements with the deleted one
     offsetTemp.push(0);
     vector<T> TempOfdata;
     for (T elem : OriginalVector)
@@ -277,9 +275,9 @@ void DeleteForAll(string filepath,vector<T>& OriginalVector,string DeletedTarget
 
         }
         TempOfdata.push_back(elem);
-        Temprory<T> = TempOfdata;
-    }
 
+    }
+    Temprory<T> = TempOfdata;
 
 
     OriginalVector.clear();

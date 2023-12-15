@@ -40,45 +40,63 @@ public:
 
 ///********************************Import DATA********************************************************************
     template <typename T>
-    void ImportDataFile(string filepath,vector<T>& OriginalVector){
+        void ImportDataFile(string filepath,vector<T>& OriginalVector){
         fstream File;
         File.open(filepath, ios::in|ios::out|ios::app);
         string str,newline;
         getline(File,str);
+
+        int counter = 0,k = 0,AllLengths = 0;
+
         if(str == "")
             return;
-        while(str!=newline){
-            string sumInString;
-            for(int j = 0;j < 2;j++)
+        while(true){
+            if(newline == str)
+                return;
+            string sumInString;//The first two digits in the record
+            for(int j = AllLengths;j < AllLengths+2;j++)
                 sumInString+=str[j];
-            int sum = stoi(sumInString);
-            string member1 = "",member2 ="",member3 = "";
+
+
+            int sum = stoi(sumInString);//switch it to int
+
+            AllLengths = AllLengths + sum + 2;
+
+            string member1 = "",member2 = "",member3 = "";
+
             char check = '|';
-            int k = 0;
-            for(int i = k+2;i < sum-2;i++){
+
+            int charCounter = 0;
+            for(int i = k+2;i < AllLengths+sum;i++){
+                charCounter++;
                 if(str[i] == check)
                     break;
                 member1+=str[i];
                 k++;
             }
-            for(int i = k+3;i < sum;i++){
+            for(int i = k+3;i < AllLengths+sum;i++){
+                charCounter++;
                 if(str[i] == check)
                     break;
                 member2+=str[i];
                 k++;
             }
-            for(int i = k+4;i < sum+2;i++){
-                if(str[i] == check)
+            for(int i = k+4;i < AllLengths+sum;i++){
+                if(charCounter == sum)
                     break;
+                charCounter++;
                 member3+=str[i];
                 k++;
             }
+            k = AllLengths;
             T newT;
             newT.setFirst(member1);
             newT.setSecond(member2);
             newT.setThird(member3);
-            newline += newT.toString();
+            string newTinString = newT.toString();
+            newline = newline + newTinString;
             OriginalVector.push_back(newT);
+
         }
         File.close();
     }
@@ -92,8 +110,6 @@ public:
 
         while (getline(File, line))
         {
-            if(line == "")
-                return;
             string member1;
             string member2;
 
@@ -134,25 +150,20 @@ public:
 
         while (getline(File, line))
         {
-            if(line == "")
-                return;
-            string member1;
-            string member2;
 
-            int i;
-            for (i = 0; i < line.length(); i++)
-            {
-                if (line[i] == '|')
-                    break;
-                member1 += line[i];
-            }
-            for (int j = i+1; i < line.length()-i-1; j++)
-            {
-                member2 += line[j];
-            }
+            istringstream ss(line);
+            string token;
+
             T newT;
-            newT.setFirst(member1);
-            newT.setSecond(member2);
+
+            if (getline(ss, token, '|')) {
+                newT.setFirst(token);
+            }
+
+            if (getline(ss, token, '|')) {
+                newT.setSecond(token);
+            }
+
             OriginalVector.push_back(newT);
         }
         File.close();
@@ -176,9 +187,24 @@ public:
 ///****************************************ADD*****************************************************************
     void addAuthor(string authorId,string authorName,string address)
     {
-        AddForDataFile("Authors.txt",Authors,authorId,authorName,address);
-        AddForPIFile("PrimaryAu.txt",AuthorsPrimaryIndex,authorId,offsetAuthors);
-        AddForSIFile("SecondaryAu.txt",AutherSecondaryIndex,authorName,authorId);
+        if(AddForDataFile("Authors.txt",Authors,authorId,authorName,address)){
+            fstream FilePI("PrimaryAu.txt", std::fstream::out | std::fstream::trunc);
+            fstream FileSI("SecondaryAu.txt", std::fstream::out | std::fstream::trunc);
+            queue<int> EmptyoffsetT;
+            swap(offsetAuthors, EmptyoffsetT);
+            offsetAuthors.push(0);
+            AuthorsPrimaryIndex.clear();
+            AutherSecondaryIndex.clear();
+            for(Author elements : Authors){
+                AddForPIFile("PrimaryAu.txt",AuthorsPrimaryIndex,elements.PrimaryKey(),offsetAuthors);
+                AddForSIFile("SecondaryAu.txt",AutherSecondaryIndex,elements.getSmember(),elements.PrimaryKey());
+            }
+        }
+        else{
+            AddForPIFile("PrimaryAu.txt",AuthorsPrimaryIndex,authorId,offsetAuthors);
+            AddForSIFile("SecondaryAu.txt",AutherSecondaryIndex,authorName,authorId);
+        }
+
     }
 
     void addBook(string isbn, string title, string authorId){
@@ -205,6 +231,7 @@ public:
             addAuthor(ID,Name,Address);
             FileData.close();
         }
+        cout<<"DONE"<<endl;
 
     }
 
@@ -224,6 +251,7 @@ public:
             addBook(ID,Name,Address);
             FileData.close();
         }
+        cout<<"DONE"<<endl;
     }
 
 
@@ -243,7 +271,7 @@ public:
             addAuthor(ID,Name,Address);
             FileData.close();
         }
-
+        cout<<"DONE"<<endl;
     }
 
     void updateBook(string isbn, string newTitle)
@@ -260,6 +288,7 @@ public:
             string AuId = elem.getTmember();
             addBook(Isbn,title,AuId);
         }
+        cout<<"DONE"<<endl;
     }
 
 ///*************************************Query******************************************************************

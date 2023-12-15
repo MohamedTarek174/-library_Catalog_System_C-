@@ -8,7 +8,6 @@
 #include <functional>
 
 
-
 using namespace std;
 
 class Author
