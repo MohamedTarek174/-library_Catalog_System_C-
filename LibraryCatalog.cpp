@@ -190,9 +190,9 @@ public:
         if(AddForDataFile("Authors.txt",Authors,authorId,authorName,address)){
             fstream FilePI("PrimaryAu.txt", std::fstream::out | std::fstream::trunc);
             fstream FileSI("SecondaryAu.txt", std::fstream::out | std::fstream::trunc);
-            queue<int> EmptyoffsetT;
+            queue<int> EmptyoffsetT;//Empty the offsets queue
             swap(offsetAuthors, EmptyoffsetT);
-            offsetAuthors.push(0);
+            offsetAuthors.push(0);//Default first element
             AuthorsPrimaryIndex.clear();
             AutherSecondaryIndex.clear();
             for(Author elements : Authors){
@@ -208,10 +208,23 @@ public:
     }
 
     void addBook(string isbn, string title, string authorId){
-
-        AddForDataFile("Books.txt",Books,isbn,title,authorId);
-        AddForPIFile("PrimaryBo.txt",BooksPrimaryIndex,isbn,offsetBooks);
-        AddForSIFile("SecondaryBo.txt",BooksSecondaryIndex,authorId,isbn);
+        if(AddForDataFile("Books.txt",Books,isbn,title,authorId)){
+            fstream FilePI("PrimaryBo.txt", std::fstream::out | std::fstream::trunc);
+            fstream FileSI("SecondaryBo.txt", std::fstream::out | std::fstream::trunc);
+            queue<int> EmptyoffsetT;//Empty the offsets queue
+            swap(offsetAuthors, EmptyoffsetT);
+            offsetAuthors.push(0);//Default first element
+            BooksPrimaryIndex.clear();
+            BooksSecondaryIndex.clear();
+            for(Book elements : Books){
+                AddForPIFile("PrimaryBo.txt",BooksPrimaryIndex,elements.PrimaryKey(),offsetBooks);
+                AddForSIFile("SecondaryBo.txt",BooksSecondaryIndex,elements.getSmember(),elements.PrimaryKey());
+            }
+        }
+        else{
+            AddForPIFile("PrimaryBo.txt",BooksPrimaryIndex,isbn,offsetBooks);
+            AddForSIFile("SecondaryBo.txt",BooksSecondaryIndex,authorId,isbn);
+        }
     }
 
 ///*************************************Delete*****************************************************************
@@ -349,7 +362,7 @@ public:
                         if(query.condition.leftHand == "authorname"){
                             searchAuthorbyNameA(query.condition.rightHand,Authors);
                         }
-                        else if(query.condition.leftHand == "authurid"){
+                        else if(query.condition.leftHand == "authorid"){
                             searchbYFirstA(query.condition.rightHand,Authors);
                         }
                     }

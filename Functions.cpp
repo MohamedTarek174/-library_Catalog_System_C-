@@ -186,8 +186,7 @@ bool AddForDataFile(string filepath,vector<T>& OriginalVector,string member1,str
             {
                 string elemStrin = element.toString();
 
-                while(elemStrin.length() > newT.toString().length()){
-                    cout<<newT.toString()<<endl;
+                while(elemStrin.length() > newT.toString().length()){//To fit the same length of the deleted one
                     member3 += space;
                     newT.setThird(member3);
 
